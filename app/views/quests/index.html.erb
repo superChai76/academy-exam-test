@@ -1,0 +1,60 @@
+<% content_for :title, "My Academy Quests" %>
+
+<div class="">
+    <!-- Header card -->
+    <section class="rounded-[28px] overflow-hidden h-190">
+      <div class="relative">
+        <div class="absolute left-1/2 -translate-x-1/2">
+          <div class="mt-10 text-[28px] opacity-70 text-white">Supachai Suttiprapa</div>
+          <div class="text-amber-400 text-[40px] font-semibold">My Academy Quests</div>
+        </div>
+       
+
+        <div class="absolute -bottom-125 left-1/2 -translate-x-1/2 
+                    text-[110px] font-bold text-white opacity-70">
+          <div class="flex flex-col items-center justify-center leading-[1.2]">
+            <span>SUPACHAI</span>
+            <span>SUTTIPRAPA</span>
+          </div>
+          <div class="flex justify-end">
+          <span class="mt-2 px-6 rounded-full w-fit bg-white/80 text-[32px] text-[#0F4A84] font-bold backdrop-blur">
+            PLUB
+          </span>
+          </div>
+        </div>
+
+        <div class="absolute left-1/2 top-60 -translate-x-1/2">
+          <%= image_tag "profile_pic.png", class: "w-150 h-150 object-contain" %>
+        </div>
+
+        <div class="absolute left-1/2 -bottom-185 -translate-x-1/2 bg-white/20 border-2 border-white backdrop-blur-xl rounded-4xl px-8 py-3 text-[32px] text-white shadow-md hover:scale-90 cursor-pointer">
+          <%= link_to "My Brag document", brag_path %>
+        </div>
+      </div>
+    </section>
+
+    <!-- List container -->
+    <section class="bg-white rounded-t-[80px] p-14 h-screen mx-auto">
+        <div class="flex items-center justify-between">
+          <h2 class="text-[50px] font-bold text-[#204060]">Quests</h2>
+          <button class="btn btn-circle p-2 w-14 h-14 bg-[#FFA826] border-2 border-[#FFD7B2] shadow-amber-300 shadow-md text-white text-[50px] flex justify-center items-center cursor-pointer hover:scale-90"
+                  onclick="document.getElementById('new-quest-modal').showModal()">
+          <%= image_tag "plus.svg", class: "w-10 h-10" %>
+          </button>
+        </div>
+        <hr class="my-10 border-blue-500"/>
+        <%= render "quests" %>
+      </div>
+    </section>
+</div>
+
+<%= render "form", quest: @quest %>
+
+<% if @quest&.errors&.any? %>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('new-quest-modal').showModal();
+    });
+  </script>
+<% end %>
+
