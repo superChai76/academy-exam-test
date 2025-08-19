@@ -1,15 +1,13 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  title: MyString
-  notes: MyText
+  id: 1
+  content: "First quest from fixture"
   done: false
-  due_date: 2025-08-17
-  position: 1
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
 
 two:
-  title: MyString
-  notes: MyText
-  done: false
-  due_date: 2025-08-17
-  position: 1
+  id: 2
+  content: "Second quest from fixture"
+  done: true
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

@@ -10,32 +10,10 @@ class QuestsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
-    get new_quest_url
-    assert_response :success
-  end
-
   test "should create quest" do
     assert_difference("Quest.count") do
-      post quests_url, params: { quest: { done: @quest.done, due_date: @quest.due_date, notes: @quest.notes, position: @quest.position, title: @quest.title } }
+      post quests_url, params: { quest: { content: @quest.content, done: @quest.done, due_date: @quest.due_date, created_at: @quest.created_at, updated_at: @quest.updated_at } }
     end
-
-    assert_redirected_to quest_url(Quest.last)
-  end
-
-  test "should show quest" do
-    get quest_url(@quest)
-    assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_quest_url(@quest)
-    assert_response :success
-  end
-
-  test "should update quest" do
-    patch quest_url(@quest), params: { quest: { done: @quest.done, due_date: @quest.due_date, notes: @quest.notes, position: @quest.position, title: @quest.title } }
-    assert_redirected_to quest_url(@quest)
   end
 
   test "should destroy quest" do

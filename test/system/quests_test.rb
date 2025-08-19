@@ -1,4 +1,5 @@
 require "application_system_test_case"
+require "securerandom"
 
 class QuestsTest < ApplicationSystemTestCase
   setup do
@@ -7,43 +8,84 @@ class QuestsTest < ApplicationSystemTestCase
 
   test "visiting the index" do
     visit quests_url
-    assert_selector "h1", text: "Quests"
+    # UI ปัจจุบันเป็น <h2> ไม่ใช่ <h1>
+    assert_selector "h2", text: "Quests"
+    # มีรายการอย่างน้อยของ fixture
+    assert_selector "[data-testid='quest-item-#{@quest.id}']"
   end
 
-  test "should create quest" do
+  test "creates a new quest from modal" do
     visit quests_url
-    click_on "New quest"
 
-    check "Done" if @quest.done
-    fill_in "Due date", with: @quest.due_date
-    fill_in "Notes", with: @quest.notes
-    fill_in "Position", with: @quest.position
-    fill_in "Title", with: @quest.title
-    click_on "Create Quest"
+    # เปิดโมดัลด้วยปุ่ม + (ไม่มีลิงก์ "New quest" แล้ว)
+    find("[data-testid='new-quest-btn']").click
+    assert_selector "dialog#new-quest-modal[open]"
 
-    assert_text "Quest was successfully created"
-    click_on "Back"
+    content = "Auto quest #{SecureRandom.hex(3)}"
+    fill_in "quest_content", with: content
+    click_on "Create"
+
+    # รอให้รายการอัปเดตแล้วเห็นข้อความที่เพิ่งสร้าง
+    assert_text content
   end
 
-  test "should update Quest" do
-    visit quest_url(@quest)
-    click_on "Edit this quest", match: :first
+  test "toggles quest done status" do
+    visit quests_url
 
-    check "Done" if @quest.done
-    fill_in "Due date", with: @quest.due_date
-    fill_in "Notes", with: @quest.notes
-    fill_in "Position", with: @quest.position
-    fill_in "Title", with: @quest.title
-    click_on "Update Quest"
+    cb_selector = "[data-testid='quest-done-checkbox-#{@quest.id}']"
+    span_selector = "[data-testid='quest-content-#{@quest.id}']"
 
-    assert_text "Quest was successfully updated"
-    click_on "Back"
+    checkbox = find(cb_selector, visible: :all)
+    initially_checked = checkbox.checked?
+
+    # คลิกเพื่อสลับสถานะ
+    checkbox.click
+
+    # รอให้ Turbo รีเฟรชแล้วสถานะแตกต่างจากเดิม
+    assert_retry do
+      find(cb_selector, visible: :all).checked? != initially_checked
+    end
+
+    # สไตล์ตัวอักษรควรเปลี่ยนตามสถานะ
+    if initially_checked
+      # เดิม checked -> หลังคลิกควรเอาเส้นคาดออก
+      assert_no_selector "#{span_selector}.line-through"
+    else
+      # เดิมไม่ checked -> หลังคลิกควรมีเส้นคาด
+      assert_selector "#{span_selector}.line-through"
+    end
   end
 
-  test "should destroy Quest" do
-    visit quest_url(@quest)
-    accept_confirm { click_on "Destroy this quest", match: :first }
+  test "deletes a quest" do
+    visit quests_url
 
-    assert_text "Quest was successfully destroyed"
+    item_selector = "[data-testid='quest-item-#{@quest.id}']"
+    btn_selector  = "[data-testid='quest-delete-btn-#{@quest.id}']"
+
+    # เก็บข้อความไว้เพื่อเช็คว่าหายไปจริง
+    content_text = find("[data-testid='quest-content-#{@quest.id}']").text
+
+    accept_confirm "Are you sure?" do
+      find(btn_selector).click
+    end
+
+    # รายการต้องถูกลบออกจาก DOM
+    assert_no_selector item_selector
+    assert_no_text content_text
+  end
+
+  private
+
+  # ตัวช่วยรอการเปลี่ยนแปลง (เพราะเช็ก checked? ตรงๆ ไม่ได้ใช้ assert_selector)
+  def assert_retry(timeout: Capybara.default_max_wait_time)
+    start = Time.now
+    loop do
+      begin
+        return assert(yield)
+      rescue Minitest::Assertion
+        raise if Time.now - start > timeout
+        sleep 0.1
+      end
+    end
   end
 end

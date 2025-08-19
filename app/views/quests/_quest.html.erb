@@ -1,4 +1,7 @@
-<div id="<%= dom_id quest %>" class="w-full shadow-lg border-2 border-gray-200 rounded-2xl p-6 <%= 'opacity-40' if quest.done %>">
+<div id="<%= dom_id quest %>" 
+     class="w-full shadow-lg border-2 border-gray-200 rounded-2xl p-6 <%= 'opacity-40' if quest.done %>"
+     data-testid="quest-item-<%= quest.id %>">
+
   <div class="flex justify-between items-center gap-2">
     <div class="flex items-center gap-4 text-3xl">
 
@@ -6,17 +9,19 @@
                     class: "inline", data: { turbo_frame: "quest_list" } do %>
         <%= check_box_tag "done", "1", quest.done,
               onchange: "this.form.requestSubmit();",
-              class: "checkbox checkbox-primary scale-120" %>
+              class: "checkbox checkbox-primary scale-120",
+              data: { testid: "quest-done-checkbox-#{quest.id}" } %>
       <% end %>
 
-      <span class="<%= 'line-through text-gray-400' if quest.done %>">
+      <span class="<%= 'line-through text-gray-400' if quest.done %>"
+            data-testid="quest-content-<%= quest.id %>">
         <%= quest.content %>
       </span>
     </div>
 
     <%= button_to quest, method: :delete,
           class:"cursor-pointer hover:scale-90",
-          data: { turbo_confirm: "Are you sure?", turbo_frame: "quest_list" } do %>
+          data: { turbo_confirm: "Are you sure?", turbo_frame: "quest_list", testid: "quest-delete-btn-#{quest.id}" } do %>
       <%= image_tag "bin.svg", class: "w-8 h-8" %>
     <% end %>
   </div>
